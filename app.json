@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "sdkVersion": "26.0.0",
+    "android": {
+      "package": "com.jcuenod.wheatfree"
+    },
+    "description": "Wheat Free is for people who can't eat gluten but want to eat Wheaton"
+  }
+}

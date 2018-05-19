@@ -1,0 +1,293 @@
+/* @flow */
+
+import * as React from 'react'
+import { Picker, Icon, TouchableOpacity, ScrollView, View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import Accordion from 'react-native-collapsible/Accordion'
+// import CollapsiblePanel from './CollapsiblePanel'
+// import ExpanableList from 'react-native-expandable-section-list'
+import { Ionicons } from '@expo/vector-icons'
+
+const url = "https://legacy.cafebonappetit.com/api/2/menus?cafe=339&date="
+
+// const titleCase = (mixedCase) => {
+// 	let i, j
+// 	let str = mixedCase.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
+// 	  return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+// 	});
+  
+// 	// Certain minor words should be left lowercase unless 
+// 	// they are the first or last words in the string
+// 	const lowers = ['A', 'An', 'The', 'And', 'But', 'Or', 'For', 'Nor', 'As', 'At', 'By', 'For', 'From', 'In', 'Into', 'Near', 'Of', 'On', 'Onto', 'To', 'With']
+// 	for (i = 0, j = lowers.length; i < j; i++) {
+// 		str = str.replace(new RegExp('\\s' + lowers[i] + '\\s', 'g'), t => t.toLowerCase())
+// 	}
+  
+// 	// Certain words such as initialisms or acronyms should be left uppercase
+// 	const uppers = ['Id', 'Tv']
+// 	for (i = 0, j = uppers.length; i < j; i++) {
+// 		str = str.replace(new RegExp('\\b' + uppers[i] + '\\b', 'g'), uppers[i].toUpperCase());
+// 	}
+  
+// 	return str;
+// }
+
+const weightedStations = {
+	"Sabor": 0,
+	"Pan Asian": 1,
+	"Classics": 2,
+	"Cucina": 3,
+	"Breakfast Bar": 4,
+	"Sandwich Bar": 5
+}
+const sortStations = (a, b) => {
+	const aWeight = weightedStations.hasOwnProperty(a.title) ? weightedStations[a.title] : 100
+	const bWeight = weightedStations.hasOwnProperty(b.title) ? weightedStations[b.title] : 100
+	return aWeight - bWeight
+}
+
+// const betterStationNames = {
+// 	"Lunch": "Sandwich Bar",
+// 	"Breakfast": "Breakfast Bar",
+// }
+// const renameStation = (oldName) => betterStationNames.hasOwnProperty(oldName) ? betterStationNames[oldName] : oldName
+
+const parseBonAppetit = (disasterJson) => disasterJson.days.map(day => {
+	//Note that by filtering for specials, we probably don't need to worry about title casing the labels so code above can go
+	const dayObj = {
+		date: day.date,
+		meals: {}
+	}
+	const menuItems = disasterJson.items
+	const specials = Object.keys(menuItems).filter(k => menuItems[k].special === 1).map(k => menuItems[k])
+	//This method removes the distinction between the different stations by concat-ing at the end
+	const mealItems = (mealIndex) => disasterJson.days[0].cafes[339].dayparts[0][mealIndex].stations.reduce((a,v) => a.concat(...v.items), [])
+	
+	const meals = disasterJson.days[0].cafes[339].dayparts[0].map((meal, i) => ({name: meal.label, index: i}))
+	//use these together to get lunch specials like:
+	//assuming that lunch index = 1 (get meal list from b.days[0].cafes[339].dayparts[0])
+	const lunchItems = mealItems(1)
+	// const lunchSpecials = lunchItems.filter(item => specials.includes(item.id))
+	const lunchSpecials = specials.filter(s => lunchItems.includes(s.id))
+	return dayObj
+	/**
+	throw("we're doing this in a dumb way, I put a nice comment here to do it smart")
+
+	const dayObj = {
+		date: day.date,
+		meals: []
+	}
+	const mealMap = {}
+	const stationMap = {}
+	const ensureMeal = (m) => {
+		if (mealMap.hasOwnProperty(m)) return
+		mealMap[m] = dayObj.meals.length
+		stationMap[m] = {}
+		dayObj.meals.push({
+			title: m,
+			stations: []
+		})
+	}
+	const ensureStation = (meal, station) => {
+		if (stationMap[meal].hasOwnProperty(station)) return
+		stationMap[meal][station] = dayObj.meals[mealMap[meal]].stations.length
+		const stationName = renameStation(station)
+		dayObj.meals[mealMap[meal]].stations.push({
+			title: stationName,
+			items: []
+		})
+	}
+	const injectMenuItem = (item, meal, station) => {
+		ensureMeal(meal)
+		ensureStation(meal, station)
+		dayObj.meals[mealMap[meal]]
+			.stations[stationMap[meal][station]]
+				.items.push(item)
+	}
+	const dp = day.cafes[339].dayparts[0]
+	dp.forEach(p => {
+		p.stations.forEach(station => {
+			const meal = p.label
+			station.items.forEach(item => {
+				//TODO: remove filterSpecials=true (this came with an update filter out all the nonsense "lettuce" etc.)
+				//      - this has implications on whether we use the accordion
+				const filterSpecials = true
+				if (disasterJson.items[item].special === 1 && filterSpecials)
+				{
+					injectMenuItem({
+						"name": titleCase(disasterJson.items[item].label),
+						"meta": disasterJson.items[item].cor_icon
+					}, meal, station.label)
+				}
+			})
+		});
+	})
+	return dayObj*/
+})
+
+const LoadingScreen = () => (
+	<View style={{flex: 1, justifyContent:"center", alignContent:"center"}}>
+		<ActivityIndicator size="large" />
+	</View>
+)
+export default class Menu extends React.Component<{}> {
+	state = {
+		menu: null,
+		selectedMeal: null,
+		activeAccordionSection: false
+	}
+	componentDidMount() {
+		const dayurl = url + this.props.day
+		// const proxyUrl = "http://192.168.0.115:3000?url=" + encodeURIComponent(dayurl)
+		fetch(dayurl).then((response) => {
+			return response.json()
+		}).then((responseJson) => {
+			const menu = parseBonAppetit(responseJson)
+			this.setState({
+				menu,
+				isLoading: false,
+				selectedMeal: "lunch"//menu.meals[0].title
+			})
+		}).catch(error => {
+			console.log(error)
+			this.setState({error: error, isLoading: false})
+		})
+	}
+	render() {
+		// const doconsts = this.state.selectedMeal !== null
+		// const mealList = doconsts ? this.state.menu.meals.map(s => s.title) : null
+		// let mealMenu = doconsts ? this.state.menu.meals.find(s => s.title === this.state.selectedMeal)
+		// 								.stations.sort(sortStations) : null
+		// const stations = doconsts ? [...new Set(mealMenu.map(m => m.station))] : null
+
+		return (
+			<ScrollView
+				style={styles.container}
+				contentContainerStyle={styles.content}
+			>
+				<View style={styles.author}>
+					<View style={styles.meta}>
+						<Text style={styles.timestamp}>{this.props.day}</Text>
+					</View>
+				</View>
+				{/* {mealList !== null ? (
+					<Picker
+						style={styles.pickerStyle}
+						selectedValue={this.state.selectedMeal}
+						onValueChange={(value, index) => this.setState({selectedMeal: value, activeAccordionSection: false})}>
+						{mealList.map(mealName => (
+							<Picker.Item key={mealName} label={mealName} value={mealName} />
+						))}
+					</Picker>
+				) : <LoadingScreen />} */}
+				{this.state.selectedMeal !== null && this.state.menu !== null ? (
+					<View>
+						{this.state.menu[0].meals[this.state.selectedMeal].map(item => (
+							<View key={item.id}>
+								<Text style={styles.menuItem}>{item.label} // {item.station}</Text>
+							</View>
+						))}
+						{/* <Accordion
+							sections={mealMenu}
+							renderHeader={(section, i, active) => (
+								<View key={section.title} style={styles.touchable}>
+									<Text style={styles.name}>{active ? "▾" : "▸"} {section.title}</Text>
+								</View>
+							)}
+							renderContent={(s, i) => (
+								<View key={s.title}>{s.items.map((item, index) => (
+									<Text key={index} style={styles.menuItem}>{item.name}</Text>
+								))}</View>
+							)}
+							activeSection={this.state.activeAccordionSection}
+							onChange={(activeAccordionSection) => this.setState({activeAccordionSection})}
+						/> */}
+					</View>
+				) : null}
+			</ScrollView>
+		)
+	}
+}
+
+const styles = StyleSheet.create({
+	container: {
+		backgroundColor: 'white',
+	},
+	content: {
+		paddingVertical: 16,
+	},
+	author: {
+		flexDirection: 'row',
+		marginVertical: 8,
+		marginHorizontal: 16,
+	},
+	meta: {
+		marginHorizontal: 8,
+		justifyContent: 'center',
+	},
+	name: {
+		color: '#000',
+		fontWeight: 'bold',
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	timestamp: {
+		color: '#999',
+		fontSize: 14,
+		lineHeight: 21,
+	},
+	avatar: {
+		height: 48,
+		width: 48,
+		borderRadius: 24,
+	},
+	title: {
+		color: '#000',
+		fontWeight: 'bold',
+		fontSize: 36,
+		marginVertical: 8,
+		marginHorizontal: 16,
+	},
+	stationItem: {
+		color: '#000',
+		fontSize: 20,
+		lineHeight: 24,
+		marginVertical: 8,
+		marginHorizontal: 16,
+		fontWeight: 'bold'
+	},
+	menuItem: {
+		color: '#000',
+		fontSize: 16,
+		marginVertical: 8,
+		marginHorizontal: 16
+	},
+	image: {
+		width: '100%',
+		height: 200,
+		resizeMode: 'cover',
+		marginVertical: 8,
+	},
+	navBarLeftButton: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		width: 100,
+		paddingLeft: 8
+	},
+	buttonText: {
+		color: 'rgba(255,255,255,0.70)',
+		fontSize: 14
+	},
+	pickerStyle: {
+		elevation: 1,
+		marginVertical: 8,
+		marginHorizontal: 16
+	},
+	touchable: {
+		padding: 16,
+		backgroundColor: '#fff',
+		borderBottomWidth: 1,
+		borderBottomColor: 'rgba(0, 0, 0, .06)',
+	}
+});
