@@ -1,4 +1,6 @@
-# WheatFree - a quick 'n dirty app for students at Wheaton, IL
+# WheatFree
+
+An unofficial app for students at Wheaton College, IL
 
 ## Table of Contents
 
@@ -14,5 +16,8 @@
 
 ## Chapel Speakers
 
+**Developer Information**: Chapel speakers can, perhaps be gathered from https://www.wheaton.edu/life-at-wheaton/spiritual-life/chapel/chapel-schedule/ but I'm not sure yet.
 
 ## Who's Who
+
+Well, this is more complicated but I think we can get something going with a remote logon type system... We'll probably end up wanting to store keys/tokens/whatever but I think it's possible to hook in esp when wheaton moves whoswho.
