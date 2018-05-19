@@ -11,24 +11,14 @@ import {
 	View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'
-// import TopBarTextExample from './TopBarTextExample';
-// import TopBarIconExample from './TopBarIconExample';
-// import BottomBarIconTextExample from './BottomBarIconTextExample';
-// import NoAnimationExample from './NoAnimationExample';
-// import CoverflowExample from './CoverflowExample';
-import ALaCarte from './components/ALaCarte'
+import TabbedMenu from './components/TabbedMenu'
 import Whoswho from './components/Whoswho'
 import ChapelSpeakers from './components/ChapelSpeakers'
 
 const PERSISTENCE_KEY = 'index_persistence';
 
 const EXAMPLE_COMPONENTS = [
-//	 TopBarTextExample,
-//	 TopBarIconExample,
-//	 BottomBarIconTextExample,
-//	 NoAnimationExample,
-//	 CoverflowExample,
-	ALaCarte,
+	TabbedMenu,
 	Whoswho,
 	ChapelSpeakers
 ];
@@ -50,17 +40,6 @@ export default class ExampleList extends React.Component<{}, State> {
 		if (process.env.NODE_ENV !== 'production') {
 			this._restoreNavigationState();
 		}
-
-		// [
-		//	 require('../assets/album-art-1.jpg'),
-		//	 require('../assets/album-art-2.jpg'),
-		//	 require('../assets/album-art-3.jpg'),
-		//	 require('../assets/album-art-4.jpg'),
-		//	 require('../assets/album-art-5.jpg'),
-		//	 require('../assets/album-art-6.jpg'),
-		//	 require('../assets/album-art-7.jpg'),
-		//	 require('../assets/album-art-8.jpg'),
-		// ].map(image => Expo.Asset.fromModule(image).downloadAsync());
 	}
 
 	_persistNavigationState = async (currentIndex: number) => {

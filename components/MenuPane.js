@@ -103,10 +103,7 @@ export default class Menu extends React.Component {
 				flex: 1
 			}} source={getBackground(this.props.even)}>
 				{this.state.menu ? (
-					<ScrollView
-						style={styles.container}
-						contentContainerStyle={styles.content}
-					>
+					<ScrollView>
 						<View>
 							{this.state.menu.meals.map(meal => (
 								<View key={meal.name} style={styles.mealRow}>
@@ -129,12 +126,6 @@ export default class Menu extends React.Component {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		// backgroundColor: 'white',
-	},
-	content: {
-		// paddingVertical: 10,
-	},
 	mealRow: {
 		marginVertical: 15,
 		marginHorizontal: 10,
@@ -143,20 +134,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 25,
 		backgroundColor: 'rgba(0, 0, 0, 0.6)'
 	},
-	// author: {
-	// 	flexDirection: 'row',
-	// 	marginVertical: 8,
-	// 	marginHorizontal: 16,
-	// },
-	// meta: {
-	// 	marginHorizontal: 8,
-	// 	justifyContent: 'center',
-	// },
-	// timestamp: {
-	// 	color: '#fff',
-	// 	fontSize: 14,
-	// 	lineHeight: 21,
-	// },
 	title: {
 		color: '#fff',
 		fontSize: 35,
