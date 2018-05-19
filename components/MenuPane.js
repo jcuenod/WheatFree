@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { Platform, ImageBackground, ScrollView, View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import Accordion from 'react-native-collapsible/Accordion'
 
 const url = "https://legacy.cafebonappetit.com/api/2/menus?cafe=339&date="
 const backgroundImages = {
@@ -74,7 +73,6 @@ const LoadingScreen = () => (
 export default class Menu extends React.Component {
 	state = {
 		menu: null,
-		// activeAccordionSection: false,
 		isLoading: true
 	}
 	componentDidMount() {
