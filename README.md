@@ -4,6 +4,8 @@ An unofficial app for students at Wheaton College, IL
 
 ## Table of Contents
 
+<img align="right" src="screenshots/menu_screenshot.png">
+
 * [Cafeteria Menu](#cafeteria-menu)
 * [Chapel Speakers](#chapel-speakers)
 * [Who's Who](#whos-who)
