@@ -16,9 +16,9 @@ import { Ionicons } from '@expo/vector-icons'
 // import BottomBarIconTextExample from './BottomBarIconTextExample';
 // import NoAnimationExample from './NoAnimationExample';
 // import CoverflowExample from './CoverflowExample';
-import ALaCarte from './ALaCarte'
-import Whoswho from './Whoswho'
-import ChapelSpeakers from './ChapelSpeakers'
+import ALaCarte from './components/ALaCarte'
+import Whoswho from './components/Whoswho'
+import ChapelSpeakers from './components/ChapelSpeakers'
 
 const PERSISTENCE_KEY = 'index_persistence';
 
