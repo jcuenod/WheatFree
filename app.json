@@ -4,6 +4,7 @@
     "android": {
       "package": "com.jcuenod.wheatfree"
     },
-    "description": "Wheat Free is for people who can't eat gluten but want to eat Wheaton"
+    "description": "Unofficial app for students at Wheaton College, IL",
+    "icon": "assets/icon.png"
   }
 }
