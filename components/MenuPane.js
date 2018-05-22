@@ -1,7 +1,22 @@
 /* @flow */
 
 import * as React from 'react'
-import { Platform, ImageBackground, ScrollView, View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import {
+	Platform,
+	ImageBackground,
+	ScrollView,
+	View,
+	Text,
+	StyleSheet,
+	ActivityIndicator
+} from 'react-native'
+
+import {
+	AdMobBanner,
+	AdMobInterstitial,
+	PublisherBanner,
+	AdMobRewarded
+} from 'expo'
 
 const url = "https://legacy.cafebonappetit.com/api/2/menus?cafe=339&date="
 const backgroundImages = {
@@ -76,22 +91,28 @@ export default class Menu extends React.Component {
 		isLoading: true
 	}
 	componentDidMount() {
+		this.mounted = true
 		const dayurl = url + this.props.day
 		// const proxyUrl = "http://192.168.0.115:3000?url=" + encodeURIComponent(dayurl)
 		fetch(dayurl).then((response) => {
 			return response.json()
 		}).then((responseJson) => {
-			// const menu = parseBonAppetit(responseJson)
-			const fakeResponse = require("../assets/menus.json")
-			const menu = parseBonAppetit(fakeResponse)
-			this.setState({
-				menu,
-				isLoading: false,
-			})
+			const menu = parseBonAppetit(responseJson)
+			// const fakeResponse = require("../assets/menus.json")
+			// const menu = parseBonAppetit(fakeResponse)
+			if(this.mounted) {
+				this.setState({
+					menu,
+					isLoading: false,
+				})
+			}
 		}).catch(error => {
 			console.log(error)
 			this.setState({error: error, isLoading: false})
 		})
+	}
+	componentWillUnmount() {
+		this.mounted = false;
 	}
 	render() {
 		return (
@@ -102,20 +123,25 @@ export default class Menu extends React.Component {
 			}} source={getBackground(this.props.even)}>
 				{this.state.menu ? (
 					<ScrollView>
-						<View>
-							{this.state.menu.meals.map(meal => (
-								<View key={meal.name} style={styles.mealRow}>
+						{this.state.menu.meals.map(meal => (
+							<View key={meal.name}>
+								<View style={styles.mealRow}>
 									<Text style={styles.title}>{meal.name}</Text>
 									{meal.items.map((item, i) => (
 										<View style={styles.itemHolder} key={i}>
-											<Text style={styles.itemName}>{item.name}</Text>
+											<Text style={styles.itemName}>{i > 2 ? item.name.replace(/\w/g, "*") : item.name}</Text>
 											{item.description ? <Text style={styles.itemDescription}>{item.description}</Text> : null}
 											<Text style={styles.itemStation}>{item.station}</Text>
 										</View>
 									))}
 								</View>
-							))}
-						</View>
+								<AdMobBanner
+									bannerSize="smartBannerPortrait"
+									adUnitID="ca-app-pub-6398111092778033/5744428340" // This is the real one
+									// adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+									onDidFailToReceiveAdWithError={this.bannerError} />
+							</View>
+						))}
 					</ScrollView>
 				) : <LoadingScreen />}
 			</ImageBackground>
@@ -130,6 +156,11 @@ const styles = StyleSheet.create({
 		paddingTop: 15,
 		paddingBottom: 20,
 		paddingHorizontal: 25,
+		backgroundColor: 'rgba(0, 0, 0, 0.6)'
+	},
+	adRow: {
+		marginVertical: 0,
+		marginHorizontal: 0,
 		backgroundColor: 'rgba(0, 0, 0, 0.6)'
 	},
 	title: {
