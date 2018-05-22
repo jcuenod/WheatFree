@@ -1,6 +1,8 @@
 import Expo from 'expo';
 import * as React from 'react';
 import {
+	ImageBackground,
+	DrawerLayoutAndroid,
 	AsyncStorage,
 	Platform,
 	ScrollView,
@@ -32,7 +34,7 @@ type State = {
 export default class ExampleList extends React.Component<{}, State> {
 	state = {
 		title: 'Wheat Free',
-		index: -1,
+		index: 0,
 		restoring: false,
 	};
 
@@ -82,19 +84,40 @@ export default class ExampleList extends React.Component<{}, State> {
 		this._handleNavigate(-1);
 	};
 
+	_drawerMenu = () => {
+		return <View>
+			<View style={{height: 150}}>
+			<ImageBackground resizeMode='cover' style={{
+				width: "100%",
+				height: "100%",
+				flex: 1
+			}} source={require("./assets/menuheader.png")}/>
+			</View>
+			<ScrollView>{EXAMPLE_COMPONENTS.map(this._renderItem)}</ScrollView>
+		</View>
+	}
 	_renderItem = (component, i) => {
 		return (
 			<TouchableOpacity
 				key={i}
 				style={styles.touchable}
-				onPress={() => this._handleNavigate(i)}
+				onPress={() => {
+					this._handleNavigate(i)
+					this._closeDrawer()
+				}}
 			>
 				<Text style={styles.item}>
 					{i + 1}. {component.title}
 				</Text>
 			</TouchableOpacity>
 		);
-	};
+	}
+	_openDrawer() {
+		this.refs['DRAWER'].openDrawer()
+	}
+	_closeDrawer() {
+		this.refs['DRAWER'].closeDrawer()
+	}
 
 	render() {
 		if (this.state.restoring) {
@@ -123,56 +146,62 @@ export default class ExampleList extends React.Component<{}, State> {
 		const borderBottomWidth =
 			Platform.OS === 'ios' ? StyleSheet.hairlineWidth : 0;
 
+
+
 		return (
-			<View style={styles.container}>
-				<StatusBar
-					barStyle={
-						/* $FlowFixMe */
-						Platform.OS === 'ios' ? statusBarStyle : 'light-content'
-					}
-				/>
-				<Expo.KeepAwake />
-				<View
-					style={[
-						styles.statusbar,
-						backgroundColor ? { backgroundColor } : null,
-					]}
-				/>
-				<View
-					style={[
-						styles.appbar,
-						backgroundColor ? { backgroundColor } : null,
-						appbarElevation
-							? { elevation: appbarElevation, borderBottomWidth }
-							: null,
-					]}
-				>
-					{index > -1 ? (
-						<TouchableOpacity
-							style={styles.button}
-							onPress={this._handleNavigateBack}
-						>
-							<Ionicons
-								name={
-									Platform.OS === 'android' ? 'md-arrow-back' : 'ios-arrow-back'
-								}
-								size={24}
-								color={tintColor}
-							/>
-						</TouchableOpacity>
+			<DrawerLayoutAndroid
+				ref={'DRAWER'}
+				drawerWidth={300}
+				drawerPosition={DrawerLayoutAndroid.positions.Left}
+				renderNavigationView={this._drawerMenu}>
+				<View style={styles.container}>
+					<StatusBar
+						barStyle={
+							/* $FlowFixMe */
+							Platform.OS === 'ios' ? statusBarStyle : 'light-content'
+						}
+					/>
+					<Expo.KeepAwake />
+					<View
+						style={[
+							styles.statusbar,
+							backgroundColor ? { backgroundColor } : null,
+						]}
+					/>
+					<View
+						style={[
+							styles.appbar,
+							backgroundColor ? { backgroundColor } : null,
+							appbarElevation
+								? { elevation: appbarElevation, borderBottomWidth }
+								: null,
+						]}
+					>
+						{/* {index > -1 ? ( */}
+							<TouchableOpacity
+								style={styles.button}
+								onPress={this._openDrawer.bind(this)}
+							>
+								<Ionicons
+									name={Platform.OS === 'android' ? 'md-menu' : 'ios-menu'}
+									size={24}
+									color={tintColor}
+								/>
+							</TouchableOpacity>
+						{/* ) : null} */}
+						<Text style={[styles.title, tintColor ? { color: tintColor } : null]}>
+							{index > -1 ? EXAMPLE_COMPONENTS[index].title : this.state.title}
+						</Text>
+						{index > -1 ? <View style={styles.button} /> : null}
+					</View>
+					{index === -1 ? (
+						<ScrollView>{EXAMPLE_COMPONENTS.map(this._renderItem)}</ScrollView>
+					) : ExampleComponent ? (
+						<ExampleComponent />
 					) : null}
-					<Text style={[styles.title, tintColor ? { color: tintColor } : null]}>
-						{index > -1 ? EXAMPLE_COMPONENTS[index].title : this.state.title}
-					</Text>
-					{index > -1 ? <View style={styles.button} /> : null}
 				</View>
-				{index === -1 ? (
-					<ScrollView>{EXAMPLE_COMPONENTS.map(this._renderItem)}</ScrollView>
-				) : ExampleComponent ? (
-					<ExampleComponent />
-				) : null}
-			</View>
-		);
+			</DrawerLayoutAndroid>
+		)
 	}
 }
 
